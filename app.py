@@ -4,6 +4,10 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -14,11 +18,12 @@ def submit_form():
         data = request.json
         
         # Email configuration
-        sender_email = "techtrans427@gmail.com"
-        # You need to generate an App Password from Google Account settings
-        # Go to: Google Account > Security > 2-Step Verification > App Passwords
-        app_password = "qjmr ufoe jyyn unei"  # Replace with your generated App Password
+        sender_email = os.getenv("SENDER_EMAIL")
+        app_password = os.getenv("APP_PASSWORD")
         receiver_email = "techtrans427@gmail.com"
+        
+        if not sender_email or not app_password:
+            return jsonify({"status": "error", "message": "Server email configuration is missing."}), 500
         
         # Create message
         msg = MIMEMultipart()
@@ -67,4 +72,4 @@ def submit_form():
         }), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) 
+    app.run(debug=True, port=5000)
